@@ -33,7 +33,7 @@ extension Cryptors {
         var randomIV: Array<UInt8> = Array<UInt8>()
         randomIV.reserveCapacity(blockSize)
         for randomByte in RandomBytesSequence(size: blockSize) {
-            randomIV.append(randomByte)
+            randomIV.append(randomByte % 128)
         }
         return randomIV
     }
