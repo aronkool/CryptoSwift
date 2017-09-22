@@ -1,5 +1,5 @@
 //
-//  OFB.swift
+//  Array+Foundation.swift
 //  CryptoSwift
 //
 //  Copyright (C) 2014-2017 Marcin Krzyżanowski <marcin@krzyzanowskim.com>
@@ -14,35 +14,21 @@
 //  - This notice may not be removed or altered from any source or binary distribution.
 //
 
-// Output Feedback (OFB)
-//
+import Foundation
 
-struct OFBModeWorker: BlockModeWorker {
-    typealias Element = Array<UInt8>
+public extension Array where Element == UInt8 {
 
-    let cipherOperation: CipherOperationOnBlock
-    private let iv: Element
-    private var prev: Element?
-
-    init(iv: Array<UInt8>, cipherOperation: @escaping CipherOperationOnBlock) {
-        self.iv = iv
-        self.cipherOperation = cipherOperation
+    public func toBase64() -> String? {
+        return Data(bytes: self).base64EncodedString()
     }
 
-    mutating func encrypt(_ plaintext: ArraySlice<UInt8>) -> Array<UInt8> {
-        guard let ciphertext = cipherOperation(prev ?? iv) else {
-            return Array(plaintext)
-        }
-        prev = ciphertext
-        return xor(plaintext, ciphertext)
-    }
+    public init(base64: String) {
+        self.init()
 
-    mutating func decrypt(_ ciphertext: ArraySlice<UInt8>) -> Array<UInt8> {
-        guard let decrypted = cipherOperation(prev ?? iv) else {
-            return Array(ciphertext)
+        guard let decodedData = Data(base64Encoded: base64) else {
+            return
         }
-        let plaintext = xor(decrypted, ciphertext)
-        prev = decrypted
-        return plaintext
+
+        append(contentsOf: decodedData.bytes)
     }
 }
